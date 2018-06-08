@@ -11,6 +11,10 @@
  * ]
 * */
  module.exports = function (json, FileName, type) {
+        // const temp  = [json.title, ...json.data];
+        // const ws = XLSX.utils.aoa_to_sheet(temp)
+        // const wb = XLSX.utils.book_new();
+        // XLSX.utils.book_append_sheet(wb, ws, 'sheet1');
         var tmpDown; //导出的二进制对象
 
         var keyMap = []; //获取keys
@@ -46,7 +50,7 @@
         });
 
         var outputPos = Object.keys(tmpdata); //设置区域,比如表格从A1到D10
-        var tmpWB = {
+        var wb = {
             SheetNames: ['mySheet'], //保存的表标题
             Sheets: {
                 'mySheet': Object.assign({},
@@ -56,24 +60,7 @@
                     })
             }
         };
-        tmpDown = new Blob([s2ab(XLSX.write(tmpWB,
-            {bookType: (type == undefined ? 'xlsx' : type), bookSST: false, type: 'binary'}//这里的数据是用来定义导出的格式类型
-        ))], {
-            type: ""
-        });//创建二进制对象写入转换好的字节流
-        var href = URL.createObjectURL(tmpDown); //创建对象超链接
-
-        var link = document.createElement("a");
-        link.href = href;
-        link.style = "visibility:hidden";
-        link.download = FileName + ".xlsx";
-
-        document.body.appendChild(link);
-        link.click();
-        setTimeout(function () { //延时释放
-            URL.revokeObjectURL(tmpDown); //用URL.revokeObjectURL()来释放这个object URL
-            document.body.removeChild(link);
-        }, 100);
+        XLSX.writeFile(wb, `${FileName}.${type || 'xlsx'}`)
     };
 
     function s2ab(s) { //字符串转字符流
